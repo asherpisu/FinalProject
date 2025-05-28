@@ -1,58 +1,38 @@
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.awt.geom.*;
 
+public class Simulation extends Frame {
+       
+   public Simulation(){
+      super("Sandbox");
+      prepareGUI();
+   }
 
-public class Simulation {
-	private static Frame frame;
-	private int width;
-	private int length;
-	private Dimension d;
-	
+   public static void main(String[] args){
+      Simulation sim = new Simulation();  
+      sim.setVisible(true);
+   }
 
-	
-	public Simulation(int width, int length) {
-		this.width=width;
-		this.length=length;
-		prepareGUI();
-	}
-	
-	public Simulation(Dimension size) {
-		this.d=size;
-		prepareGUI(size);
-	}
+   private void prepareGUI(){
+      setSize(400,400);
+      addWindowListener(new WindowAdapter() {
+         public void windowClosing(WindowEvent windowEvent){
+            System.exit(0);
+         }        
+      }); 
+   }    
 
-	public static Frame getFrame() {
-		return frame;
-	}
-	
-	private void prepareGUI() {
-		frame = new Frame("Program");
-		frame.setSize(width, length);
-		frame.setVisible(true);
-		frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                System.exit(0);
-            }
-        });
-		
-	}
-	
-	private void prepareGUI(Dimension d) {
-		frame = new Frame("Program");
-		frame.setSize(d);
-		frame.setVisible(true);
-		frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                System.exit(0);
-            }
-        });
-	}
-
-
+   @Override
+   public void paint(Graphics g) {
+      Rectangle2D shape = new Rectangle2D.Float();
+      shape.setFrame(100, 150, 200,100);
+      Graphics2D g2 = (Graphics2D) g; 
+      g2.draw (shape);
+      Font font = new Font("Serif", Font.PLAIN, 24);
+      g2.setFont(font);
+   }
 }
 
