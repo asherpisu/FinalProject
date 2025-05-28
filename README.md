@@ -1,17 +1,10 @@
 ## High-Level Overview
 
-This is an attempt to recreate Noita's particle simulation in java. 
+This is an attempt to recreate Noita's particle simulation in java. I'm using a similar approach to other people's projects attempting the same, by using cellular automata to manage interactions between particles.
 
-## Folder Structure
+## Program Structure
 
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+The Particle class will have [complete later].
 
 ## Dependencies
 
