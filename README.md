@@ -1,6 +1,6 @@
-## Getting Started
+## High-Level Overview
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+This is an attempt to recreate Noita's particle simulation in java. 
 
 ## Folder Structure
 
@@ -13,6 +13,6 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 > If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
 
-## Dependency Management
+## Dependencies
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+The only dependencies of this project are built in java utilities, such as Java AWT.
