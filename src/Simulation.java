@@ -9,6 +9,7 @@ public class Simulation {
 	private int length;
 	private Dimension d;
 	
+
 	
 	public Simulation(int width, int length) {
 		this.width=width;
@@ -17,7 +18,7 @@ public class Simulation {
 	}
 	
 	public Simulation(Dimension size) {
-		this.d =size;
+		this.d=size;
 		prepareGUI(size);
 	}
 
@@ -36,7 +37,7 @@ public class Simulation {
                 System.exit(0);
             }
         });
-		Sandbox box = new Sandbox(800,800,this);
+		
 	}
 	
 	private void prepareGUI(Dimension d) {
@@ -51,5 +52,7 @@ public class Simulation {
             }
         });
 	}
+
+
 }
 
