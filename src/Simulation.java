@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.*;
 import java.awt.geom.*;
 
 public class Simulation extends Frame {
@@ -17,7 +16,7 @@ public class Simulation extends Frame {
    }
 
    private void prepareGUI(){
-      setSize(400,400);
+      setSize(800,800);
       addWindowListener(new WindowAdapter() {
          public void windowClosing(WindowEvent windowEvent){
             System.exit(0);
@@ -27,8 +26,8 @@ public class Simulation extends Frame {
 
    @Override
    public void paint(Graphics g) {
-      Rectangle2D shape = new Rectangle2D.Float();
-      shape.setFrame(100, 150, 200,100);
+      Sandbox shape = new Sandbox();
+      shape.setFrame(shape.x, shape.y, shape.width, shape.height);
       Graphics2D g2 = (Graphics2D) g; 
       g2.draw (shape);
       Font font = new Font("Serif", Font.PLAIN, 24);
