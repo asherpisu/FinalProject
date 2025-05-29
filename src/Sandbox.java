@@ -7,4 +7,8 @@ public class Sandbox extends Rectangle {
 	public Sandbox() { 
         super(50,50,700,700);
 	}
+
+    public void gravity() {
+        
+    }
 }

@@ -1,6 +1,6 @@
 ## High-Level Overview
 
-This is an attempt to recreate Noita's particle simulation in Java. I'm using a similar approach to other people's projects attempting the same, by using cellular automata to manage interactions between particles.
+This is an attempt to recreate Noita's particle simulation in Java. I'm using a similar approach to former attempts by using cellular automata to manage interactions between particles.
 
 ## Program Structure
 
