@@ -5,7 +5,7 @@ import java.awt.geom.*;
 
 public class Simulation extends Frame {
        
-    Particle[][] particles = new Particle[70][70];
+    Particle[][] particles = new Particle[500][500];
 
    public Simulation(){
       super("Sandbox");
@@ -17,7 +17,7 @@ public class Simulation extends Frame {
       sim.setVisible(true);
    }
 
-   private void prepareGUI(){
+   private void prepareGUI() {
       setSize(600,600);
       addWindowListener(new WindowAdapter() {
          public void windowClosing(WindowEvent windowEvent){
