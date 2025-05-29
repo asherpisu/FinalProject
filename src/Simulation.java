@@ -18,7 +18,7 @@ public class Simulation extends Frame {
    }
 
    private void prepareGUI(){
-      setSize(1000,1000);
+      setSize(600,600);
       addWindowListener(new WindowAdapter() {
          public void windowClosing(WindowEvent windowEvent){
             System.exit(0);

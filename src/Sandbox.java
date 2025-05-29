@@ -8,7 +8,7 @@ public class Sandbox extends Rectangle {
     private Particle[][] particles;
 
 	public Sandbox(Particle[][] particles) { 
-        super(100,100,1000,1000);
+        super(50,50,500,500);
         this.particles = particles;
 	}
 
