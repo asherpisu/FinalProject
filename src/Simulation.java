@@ -5,6 +5,8 @@ import java.awt.geom.*;
 
 public class Simulation extends Frame {
        
+    Particle[][] particles = new Particle[70][70];
+
    public Simulation(){
       super("Sandbox");
       prepareGUI();
@@ -16,7 +18,7 @@ public class Simulation extends Frame {
    }
 
    private void prepareGUI(){
-      setSize(800,800);
+      setSize(1000,1000);
       addWindowListener(new WindowAdapter() {
          public void windowClosing(WindowEvent windowEvent){
             System.exit(0);
@@ -26,7 +28,7 @@ public class Simulation extends Frame {
 
    @Override
    public void paint(Graphics g) {
-      Sandbox shape = new Sandbox();
+      Sandbox shape = new Sandbox(particles);
       shape.setFrame(shape.x, shape.y, shape.width, shape.height);
       Graphics2D g2 = (Graphics2D) g; 
       g2.draw (shape);

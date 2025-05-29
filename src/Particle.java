@@ -11,8 +11,8 @@ public class Particle extends Rectangle{
 	private Color color;
 	private String id;
 	private boolean updated;	
-	
-	public Particle(int x, int y,int size, int velocity, Color color, String id, boolean updated) {
+    
+    public Particle(int x, int y,int size, int velocity, Color color, String id, boolean updated) {
         super(x, y, size, size);
 		this.size = size;
         this.velocity = velocity;
@@ -21,6 +21,21 @@ public class Particle extends Rectangle{
         this.updated = updated;
 	}
 
+    public void setVelocity(int velocity) {
+        this.velocity = velocity;
+    }
 
+    public int getVelocity() {
+        return this.velocity;
+    }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void update(){
+        
+    }
 }
 
