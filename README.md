@@ -8,4 +8,4 @@ The Particle class will have [complete later].
 
 ## Dependencies
 
-The only dependencies of this project are built in java utilities, such as Java AWT.
+This project is built using Maven, and uses the Light Weight Game Library for Java, in order to access OpenGL bindings.
