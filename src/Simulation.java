@@ -43,10 +43,11 @@ public class Simulation {
 		// Configure GLFW
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
+		
 
 		// Create the window
-		window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(500, 500, "Hello World!", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -77,9 +78,11 @@ public class Simulation {
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		//set window title
+		glfwSetWindowTitle(window, "Sandbox");
 		// Enable v-sync
 		glfwSwapInterval(1);
-
+		glfwSetWindowAspectRatio(window, 1, 1);
 		// Make the window visible
 		glfwShowWindow(window);
 	}
@@ -93,7 +96,7 @@ public class Simulation {
 		GL.createCapabilities();
 
 		// Set the clear color
-		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
@@ -101,7 +104,6 @@ public class Simulation {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
 			glfwSwapBuffers(window); // swap the color buffers
-
 			// Poll for window events. The key callback above will only be
 			// invoked during this call.
 			glfwPollEvents();
