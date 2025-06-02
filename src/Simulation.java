@@ -47,7 +47,7 @@ public class Simulation {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 		// Create the window
-		window = glfwCreateWindow(300, 300, "Particle Sandbox", NULL, NULL);
+		window = glfwCreateWindow(500, 500, "Particle Sandbox", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -94,12 +94,25 @@ public class Simulation {
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
+			drawSquare();
+
 			glfwSwapBuffers(window); 
 			glfwPollEvents();
 		}
 	}
 
-
+	public static void drawSquare() {
+		glBegin(GL_TRIANGLES);
+			glVertex2f(0.0f, 0.100f);
+			glVertex2f(0.1f, 0.0f);
+			glVertex2f(0.0f, 0.0f);
+		glEnd();
+		glBegin(GL_TRIANGLES);
+			glVertex2f(0.0f, 0.1f);
+			glVertex2f(0.1f, 0.1f);
+			glVertex2f(0.1f, 0.0f);
+		glEnd();
+	}
 
 	public static void main(String[] args) {
 		new Simulation().run();
