@@ -26,6 +26,22 @@
             "mainClass": "Simulation",
             "projectName": "FinalProject_584ffc7e",
             "vmArgs": "-XstartOnFirstThread"
+        },
+                {
+            "type": "java",
+            "name": "Mesh",
+            "request": "launch",
+            "mainClass": "Simulation",
+            "projectName": "FinalProject_584ffc7e",
+            "vmArgs": "-XstartOnFirstThread"
+        },
+                {
+            "type": "java",
+            "name": "MeshLoader",
+            "request": "launch",
+            "mainClass": "Simulation",
+            "projectName": "FinalProject_584ffc7e",
+            "vmArgs": "-XstartOnFirstThread"
         }
         
     ]
