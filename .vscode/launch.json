@@ -6,6 +6,15 @@
     "configurations": [
         {
             "type": "java",
+            "name": "SandSim",
+            "request": "launch",
+            "mainClass": "SandSim",
+            "projectName": "FinalProject_584ffc7e",
+            "cwd": "${workspaceFolder}",
+            "vmArgs": "-XstartOnFirstThread"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}",
@@ -27,7 +36,7 @@
             "projectName": "FinalProject_584ffc7e",
             "vmArgs": "-XstartOnFirstThread"
         },
-                {
+        {
             "type": "java",
             "name": "Mesh",
             "request": "launch",
@@ -35,7 +44,7 @@
             "projectName": "FinalProject_584ffc7e",
             "vmArgs": "-XstartOnFirstThread"
         },
-                {
+        {
             "type": "java",
             "name": "MeshLoader",
             "request": "launch",
@@ -43,6 +52,5 @@
             "projectName": "FinalProject_584ffc7e",
             "vmArgs": "-XstartOnFirstThread"
         }
-        
     ]
 }
