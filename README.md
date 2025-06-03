@@ -10,3 +10,11 @@ extrememly high amount of particles within the sandbox without a proportionate g
 ## Dependencies
 
 This project is built using Maven, and uses the Light Weight Game Library for Java, in order to access OpenGL/GLFW bindings for Java.
+
+## How to Use
+
+This sandbox is split into three different particle types. Each of which can be accessed by toggling between the 1 (sand),2 (water), and 3 (stationary) keys. Then, simply holding the left mouse key will suffice to instantiate these particles upon the screen.
+
+![alt text](image.png)
+
+
