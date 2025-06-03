@@ -9,52 +9,10 @@ import java.nio.file.Paths;
 import java.io.IOException;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
-import static org.lwjgl.opengl.GL11.GL_RGBA8;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
-import static org.lwjgl.opengl.GL11.glTexSubImage2D;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glAttachShader;
-import static org.lwjgl.opengl.GL20.glCompileShader;
-import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glCreateShader;
-import static org.lwjgl.opengl.GL20.glDeleteShader;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
-import static org.lwjgl.opengl.GL20.glGetProgrami;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20.glGetShaderi;
-import static org.lwjgl.opengl.GL20.glLinkProgram;
-import static org.lwjgl.opengl.GL20.glShaderSource;
-import static org.lwjgl.opengl.GL20.glUseProgram;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL33.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class SandSim {
@@ -65,14 +23,14 @@ public class SandSim {
     final int GRID_WIDTH = WIDTH / CELL_SIZE;
     final int GRID_HEIGHT = HEIGHT / CELL_SIZE;
 
-    enum Type { EMPTY, SAND }
+    enum Type { EMPTY, SAND, WATER }
 
     Type[][] grid = new Type[GRID_WIDTH][GRID_HEIGHT];
     int[] pixels = new int[GRID_WIDTH * GRID_HEIGHT];
 
     int textureID, shaderProgram, vao;
-
-	boolean mouseDown = false;
+    boolean mouseDown = false;
+    Type currentType = Type.SAND;
 
     void run() {
         init();
@@ -84,41 +42,34 @@ public class SandSim {
     void init() {
         if (!glfwInit()) throw new RuntimeException("GLFW Init Failed");
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE); // Note: Mr. Scheffel, if you are trying to run on windows,
-																// remove this line if there are any problems
-	
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
         window = glfwCreateWindow(WIDTH, HEIGHT, "SandSim", NULL, NULL);
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
         glfwSwapInterval(1);
 
-        // Initialize grid
         for (int x = 0; x < GRID_WIDTH; x++)
             for (int y = 0; y < GRID_HEIGHT; y++)
                 grid[x][y] = Type.EMPTY;
 
-        // Mouse input
         glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
-            if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-                DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
-                DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
-                glfwGetCursorPos(window, xb, yb);
-                int gx = (int)(xb.get(0) / CELL_SIZE);
-                int gy = (int)((HEIGHT - yb.get(0)) / CELL_SIZE);
-                if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT)
-                    grid[gx][gy] = Type.SAND;
+            if (button == GLFW_MOUSE_BUTTON_LEFT)
+                mouseDown = (action == GLFW_PRESS || action == GLFW_REPEAT);
+        });
+
+        glfwSetKeyCallback(window, (win, key, scancode, action, mods) -> {
+            if (action == GLFW_PRESS) {
+                if (key == GLFW_KEY_1) currentType = Type.SAND;
+                if (key == GLFW_KEY_2) currentType = Type.WATER;
             }
         });
 
-        // Shaders
-        shaderProgram = createShader("/Users/aashrithpisupati/Library/CloudStorage/OneDrive-LakeWashingtonSchoolDistrict/2024-2025 10th grade/AP CSA/FinalProjectWorkspace/FinalProject/src/vertex.glsl"
-									,"/Users/aashrithpisupati/Library/CloudStorage/OneDrive-LakeWashingtonSchoolDistrict/2024-2025 10th grade/AP CSA/FinalProjectWorkspace/FinalProject/src/fragment.glsl");
+        shaderProgram = createShader("src/vertex.glsl", "src/fragment.glsl");
 
-        // VAO + Quad
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
@@ -144,7 +95,6 @@ public class SandSim {
         glVertexAttribPointer(1, 2, GL_FLOAT, false, 4 * 4, 2 * 4);
         glEnableVertexAttribArray(1);
 
-        // Texture
         textureID = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, GRID_WIDTH, GRID_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer)null);
@@ -162,6 +112,16 @@ public class SandSim {
     }
 
     void update() {
+        if (mouseDown) {
+            DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
+            DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
+            glfwGetCursorPos(window, xb, yb);
+            int gx = (int)(xb.get(0) / CELL_SIZE);
+            int gy = (int)((HEIGHT - yb.get(0)) / CELL_SIZE);
+            if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT)
+                grid[gx][gy] = currentType;
+        }
+
         for (int y = GRID_HEIGHT - 2; y >= 0; y--) {
             for (int x = 0; x < GRID_WIDTH; x++) {
                 if (grid[x][y] == Type.SAND) {
@@ -175,6 +135,32 @@ public class SandSim {
                         grid[x + 1][y + 1] = Type.SAND;
                         grid[x][y] = Type.EMPTY;
                     }
+                } else if (grid[x][y] == Type.WATER) {
+                    if (grid[x][y + 1] == Type.EMPTY) {
+                        grid[x][y + 1] = Type.WATER;
+                        grid[x][y] = Type.EMPTY;
+                    } else {
+                        boolean moved = false;
+                        if (x > 0 && grid[x - 1][y] == Type.EMPTY) {
+                            grid[x - 1][y] = Type.WATER;
+                            grid[x][y] = Type.EMPTY;
+                            moved = true;
+                        } else if (x < GRID_WIDTH - 1 && grid[x + 1][y] == Type.EMPTY) {
+                            grid[x + 1][y] = Type.WATER;
+                            grid[x][y] = Type.EMPTY;
+                            moved = true;
+                        }
+
+                        if (!moved) {
+                            if (x > 0 && grid[x - 1][y + 1] == Type.EMPTY) {
+                                grid[x - 1][y + 1] = Type.WATER;
+                                grid[x][y] = Type.EMPTY;
+                            } else if (x < GRID_WIDTH - 1 && grid[x + 1][y + 1] == Type.EMPTY) {
+                                grid[x + 1][y + 1] = Type.WATER;
+                                grid[x][y] = Type.EMPTY;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -182,9 +168,11 @@ public class SandSim {
         for (int y = 0; y < GRID_HEIGHT; y++) {
             for (int x = 0; x < GRID_WIDTH; x++) {
                 if (grid[x][y] == Type.SAND)
-                    pixels[y * GRID_WIDTH + x] = 0xFFC8A000;
+                    pixels[y * GRID_WIDTH + x] = 0xFFC8A000; // Sand color
+                else if (grid[x][y] == Type.WATER)
+                    pixels[y * GRID_WIDTH + x] = 0xFF4060FF; // Water color
                 else
-                    pixels[y * GRID_WIDTH + x] = 0xFF000000;
+                    pixels[y * GRID_WIDTH + x] = 0xFF000000; // Empty = black
             }
         }
 
