@@ -169,7 +169,21 @@ public class SandSim {
                             grid[x + 1][y + 1] = Type.WATER;
                             grid[x][y] = Type.EMPTY;
                             moved = true;
-                        } else if (x > 0 && grid[x - 1][y] == Type.EMPTY) {
+                        } 
+                        if ((x > 0 && grid[x - 1][y] == Type.EMPTY) && (x < GRID_WIDTH - 1 && grid[x + 1][y] == Type.EMPTY)) {
+                            double randNum = rand.nextDouble();
+                            if (randNum<0.5) {
+                                grid[x - 1][y] = Type.WATER;
+                                grid[x][y] = Type.EMPTY;
+                                moved = true;
+                            }
+                            else {
+                                grid[x + 1][y] = Type.WATER;
+                                grid[x][y] = Type.EMPTY;
+                                moved = true;
+                            }
+                        } 
+                        else if (x > 0 && grid[x - 1][y] == Type.EMPTY) {
                             grid[x - 1][y] = Type.WATER;
                             grid[x][y] = Type.EMPTY;
                             moved = true;
