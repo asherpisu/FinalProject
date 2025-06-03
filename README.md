@@ -13,8 +13,8 @@ This project is built using Maven, and uses the Light Weight Game Library for Ja
 
 ## How to Use
 
-This sandbox is split into three different particle types. Each of which can be accessed by toggling between the 1 (sand),2 (water), and 3 (stationary) keys. Then, simply holding the left mouse key will suffice to instantiate these particles upon the screen.
+This sandbox is split into three different particle types. Each of which can be accessed by toggling between the "1" (sand), "2" (water), and "3" (wood) keys. Then, by holding down or clicking the left mouse button, one can instantiate these particles into the sandbox.
 
-![alt text](image.png)
+![alt text](image-1.png)
 
 
