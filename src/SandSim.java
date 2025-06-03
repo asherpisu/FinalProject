@@ -6,6 +6,7 @@ import org.lwjgl.opengl.*;
 import java.nio.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 import java.io.IOException;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -129,7 +130,7 @@ public class SandSim {
         for (int y = GRID_HEIGHT - 2; y >= 0; y--) {
             for (int x = 0; x < GRID_WIDTH; x++) {
                 Type t = grid[x][y];
-
+                Random rand = new Random();
                 if (t == Type.SAND) {
                     if (grid[x][y + 1] == Type.EMPTY || grid[x][y + 1] == Type.WATER) {
                         grid[x][y + 1] = Type.SAND;
@@ -145,9 +146,22 @@ public class SandSim {
                     if (grid[x][y + 1] == Type.EMPTY) {
                         grid[x][y + 1] = Type.WATER;
                         grid[x][y] = Type.EMPTY;
-                    } else {
+                    } 
+                    else {
                         boolean moved = false;
-                        if (x > 0 && grid[x - 1][y + 1] == Type.EMPTY) {
+                        if ((x > 0 && grid[x - 1][y + 1] == Type.EMPTY) && (x < GRID_WIDTH - 1 && grid[x + 1][y + 1] == Type.EMPTY)) {
+                            double randNum = rand.nextDouble();
+                            if (randNum<0.5) {
+                                grid[x - 1][y + 1] = Type.WATER;
+                                grid[x][y] = Type.EMPTY;
+                                moved = true;
+                            }
+                            else {
+                                grid[x + 1][y + 1] = Type.WATER;
+                                grid[x][y] = Type.EMPTY;
+                                moved = true;
+                            }
+                        } else if (x > 0 && grid[x - 1][y + 1] == Type.EMPTY) {
                             grid[x - 1][y + 1] = Type.WATER;
                             grid[x][y] = Type.EMPTY;
                             moved = true;
@@ -200,7 +214,6 @@ public class SandSim {
             buffer.put((byte)((p >> 24) & 0xFF));
         }
         buffer.flip();
-
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, GRID_WIDTH, GRID_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     }
