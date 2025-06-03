@@ -1,7 +1,7 @@
 import org.lwjgl.*;
-import org.lwjgl.glfw.*;
+// import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
+// import org.lwjgl.system.*;
 
 import java.nio.*;
 import java.nio.file.Files;
@@ -23,7 +23,7 @@ public class SandSim {
     final int GRID_WIDTH = WIDTH / CELL_SIZE;
     final int GRID_HEIGHT = HEIGHT / CELL_SIZE;
 
-    enum Type { EMPTY, SAND, WATER, WOOD }
+    enum Type {EMPTY, SAND, WATER, WOOD}
 
     Type[][] grid = new Type[GRID_WIDTH][GRID_HEIGHT];
     int[] pixels = new int[GRID_WIDTH * GRID_HEIGHT];
@@ -167,6 +167,7 @@ public class SandSim {
                         if (moved) continue;
                     }
                 }
+                
                 // Wood does not move
             }
         }
