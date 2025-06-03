@@ -88,6 +88,7 @@ public class Simulation {
 	private void loop() {
 		GL.createCapabilities();
 
+
 		// Set the clear color
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
