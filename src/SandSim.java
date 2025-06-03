@@ -23,12 +23,13 @@ public class SandSim {
     final int GRID_WIDTH = WIDTH / CELL_SIZE;
     final int GRID_HEIGHT = HEIGHT / CELL_SIZE;
 
-    enum Type { EMPTY, SAND, WATER }
+    enum Type { EMPTY, SAND, WATER, WOOD }
 
     Type[][] grid = new Type[GRID_WIDTH][GRID_HEIGHT];
     int[] pixels = new int[GRID_WIDTH * GRID_HEIGHT];
 
     int textureID, shaderProgram, vao;
+
     boolean mouseDown = false;
     Type currentType = Type.SAND;
 
@@ -58,13 +59,14 @@ public class SandSim {
 
         glfwSetMouseButtonCallback(window, (win, button, action, mods) -> {
             if (button == GLFW_MOUSE_BUTTON_LEFT)
-                mouseDown = (action == GLFW_PRESS || action == GLFW_REPEAT);
+                mouseDown = (action == GLFW_PRESS);
         });
 
         glfwSetKeyCallback(window, (win, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
                 if (key == GLFW_KEY_1) currentType = Type.SAND;
                 if (key == GLFW_KEY_2) currentType = Type.WATER;
+                if (key == GLFW_KEY_3) currentType = Type.WOOD;
             }
         });
 
@@ -105,59 +107,66 @@ public class SandSim {
     void loop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
+            if (mouseDown) placeParticle();
             update();
             render();
             glfwSwapBuffers(window);
         }
     }
 
-    void update() {
-        if (mouseDown) {
-            DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
-            DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
-            glfwGetCursorPos(window, xb, yb);
-            int gx = (int)(xb.get(0) / CELL_SIZE);
-            int gy = (int)((HEIGHT - yb.get(0)) / CELL_SIZE);
-            if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT)
-                grid[gx][gy] = currentType;
+    void placeParticle() {
+        DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
+        DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
+        glfwGetCursorPos(window, xb, yb);
+        int gx = (int)(xb.get(0) / CELL_SIZE);
+        int gy = (int)((yb.get(0)) / CELL_SIZE);
+        if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT) {
+            grid[gx][gy] = currentType;
         }
+    }
+
+    void update() {
+        Type[][] newGrid = new Type[GRID_WIDTH][GRID_HEIGHT];
+        for (int x = 0; x < GRID_WIDTH; x++)
+            for (int y = 0; y < GRID_HEIGHT; y++)
+                newGrid[x][y] = grid[x][y];
 
         for (int y = GRID_HEIGHT - 2; y >= 0; y--) {
             for (int x = 0; x < GRID_WIDTH; x++) {
-                if (grid[x][y] == Type.SAND) {
-                    if (grid[x][y + 1] == Type.EMPTY) {
-                        grid[x][y + 1] = Type.SAND;
-                        grid[x][y] = Type.EMPTY;
-                    } else if (x > 0 && grid[x - 1][y + 1] == Type.EMPTY) {
-                        grid[x - 1][y + 1] = Type.SAND;
-                        grid[x][y] = Type.EMPTY;
-                    } else if (x < GRID_WIDTH - 1 && grid[x + 1][y + 1] == Type.EMPTY) {
-                        grid[x + 1][y + 1] = Type.SAND;
-                        grid[x][y] = Type.EMPTY;
+                Type t = grid[x][y];
+                if (t == Type.SAND) {
+                    if (grid[x][y + 1] == Type.EMPTY || grid[x][y + 1] == Type.WATER) {
+                        newGrid[x][y + 1] = Type.SAND;
+                        newGrid[x][y] = (grid[x][y + 1] == Type.WATER) ? Type.WATER : Type.EMPTY;
+                    } else if (x > 0 && (grid[x - 1][y + 1] == Type.EMPTY || grid[x - 1][y + 1] == Type.WATER)) {
+                        newGrid[x - 1][y + 1] = Type.SAND;
+                        newGrid[x][y] = (grid[x - 1][y + 1] == Type.WATER) ? Type.WATER : Type.EMPTY;
+                    } else if (x < GRID_WIDTH - 1 && (grid[x + 1][y + 1] == Type.EMPTY || grid[x + 1][y + 1] == Type.WATER)) {
+                        newGrid[x + 1][y + 1] = Type.SAND;
+                        newGrid[x][y] = (grid[x + 1][y + 1] == Type.WATER) ? Type.WATER : Type.EMPTY;
                     }
-                } else if (grid[x][y] == Type.WATER) {
+                } else if (t == Type.WATER) {
                     if (grid[x][y + 1] == Type.EMPTY) {
-                        grid[x][y + 1] = Type.WATER;
-                        grid[x][y] = Type.EMPTY;
+                        newGrid[x][y + 1] = Type.WATER;
+                        newGrid[x][y] = Type.EMPTY;
                     } else {
                         boolean moved = false;
                         if (x > 0 && grid[x - 1][y] == Type.EMPTY) {
-                            grid[x - 1][y] = Type.WATER;
-                            grid[x][y] = Type.EMPTY;
+                            newGrid[x - 1][y] = Type.WATER;
+                            newGrid[x][y] = Type.EMPTY;
                             moved = true;
                         } else if (x < GRID_WIDTH - 1 && grid[x + 1][y] == Type.EMPTY) {
-                            grid[x + 1][y] = Type.WATER;
-                            grid[x][y] = Type.EMPTY;
+                            newGrid[x + 1][y] = Type.WATER;
+                            newGrid[x][y] = Type.EMPTY;
                             moved = true;
                         }
-
-                        if (!moved) {
+                        if (!moved && y < GRID_HEIGHT - 1) {
                             if (x > 0 && grid[x - 1][y + 1] == Type.EMPTY) {
-                                grid[x - 1][y + 1] = Type.WATER;
-                                grid[x][y] = Type.EMPTY;
+                                newGrid[x - 1][y + 1] = Type.WATER;
+                                newGrid[x][y] = Type.EMPTY;
                             } else if (x < GRID_WIDTH - 1 && grid[x + 1][y + 1] == Type.EMPTY) {
-                                grid[x + 1][y + 1] = Type.WATER;
-                                grid[x][y] = Type.EMPTY;
+                                newGrid[x + 1][y + 1] = Type.WATER;
+                                newGrid[x][y] = Type.EMPTY;
                             }
                         }
                     }
@@ -165,20 +174,29 @@ public class SandSim {
             }
         }
 
+        grid = newGrid;
+
         for (int y = 0; y < GRID_HEIGHT; y++) {
             for (int x = 0; x < GRID_WIDTH; x++) {
-                if (grid[x][y] == Type.SAND)
-                    pixels[y * GRID_WIDTH + x] = 0xFFC8A000; // Sand color
-                else if (grid[x][y] == Type.WATER)
-                    pixels[y * GRID_WIDTH + x] = 0xFF4060FF; // Water color
-                else
-                    pixels[y * GRID_WIDTH + x] = 0xFF000000; // Empty = black
+                switch (grid[x][y]) {
+                    case SAND:
+                        pixels[y * GRID_WIDTH + x] = 0xFFC8A000;
+                        break;
+                    case WATER:
+                        pixels[y * GRID_WIDTH + x] = 0xFF2060E0;
+                        break;
+                    case WOOD:
+                        pixels[y * GRID_WIDTH + x] = 0xFF804000;
+                        break;
+                    default:
+                        pixels[y * GRID_WIDTH + x] = 0xFF000000;
+                        break;
+                }
             }
         }
 
         ByteBuffer buffer = BufferUtils.createByteBuffer(GRID_WIDTH * GRID_HEIGHT * 4);
-        for (int i = 0; i < pixels.length; i++) {
-            int p = pixels[i];
+        for (int p : pixels) {
             buffer.put((byte)((p >> 16) & 0xFF));
             buffer.put((byte)((p >> 8) & 0xFF));
             buffer.put((byte)(p & 0xFF));
