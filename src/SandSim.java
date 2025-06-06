@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.*; 
 
 public class SandSim {
     long window;
@@ -170,7 +170,7 @@ public class SandSim {
                             grid[x][y] = Type.EMPTY;
                             moved = true;
                         } 
-                        else if ((x > 0 && grid[x - 1][y] == Type.EMPTY) && (x < GRID_WIDTH - 1 && grid[x + 1][y] == Type.EMPTY)) {
+                         else if ((x > 0 && grid[x - 1][y] == Type.EMPTY) && (x < GRID_WIDTH - 1 && grid[x + 1][y] == Type.EMPTY)) {
                             double randNum = rand.nextDouble();
                             if (randNum<0.5) {
                                 grid[x - 1][y] = Type.WATER;

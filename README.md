@@ -13,7 +13,7 @@ This project is built using Maven, and uses the Light Weight Game Library for Ja
 
 ## How to Use
 
-This sandbox is split into three different particle types. Each of which can be accessed by toggling between the "1" (sand), "2" (water), and "3" (wood) keys. Then, by holding down or clicking the left mouse button, one can instantiate these particles into the sandbox.
+This sandbox is split into three different particle types. Each of which can be accessed by toggling between the "1" (sand), "2" (water), and "3" (wood) keys. Then, by holding down or clicking the left mouse button, one can instantiate these particles into the sandbox. To erase particles, simply create use a different particle type while clicking on an already filled cell.
 
 ![alt text](image-1.png)
 
