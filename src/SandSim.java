@@ -21,13 +21,17 @@ public class SandSim {
 
     final int WIDTH = 800;  // window width
     final int HEIGHT = 600; // window height
-    final int CELL_SIZE = 2; // each "pixel" of sand is 2x2 screen pixels
+    final int CELL_SIZE = 1; // each "pixel" of sand is 2x2 screen pixels, I wanted  
+                             // them to be somewhat discrete, so they're not just 1x1
 
     // how many simulation cells across and down
     final int GRID_WIDTH = WIDTH / CELL_SIZE;
     final int GRID_HEIGHT = HEIGHT / CELL_SIZE;
 
     // possible cell types
+    //I chose not to use classes for these after a bunch of experimentation
+    //cause it turns out its actually a lot easier to just make them a part 
+    //of the main file w/OpenGl
     enum Type {EMPTY, SAND, WATER, WOOD}
 
     // the main simulation grid
@@ -39,7 +43,7 @@ public class SandSim {
     int textureID, shaderProgram, vao;
 
     boolean mouseDown = false; // whether mouse is pressed
-    Type currentType = Type.SAND; // what we’re placing with mouse
+    Type currentType = Type.SAND; // what we’re placing with mouse (sand is default)
 
     void run() {
         init(); // setup everything
@@ -52,7 +56,8 @@ public class SandSim {
         // initialize GLFW, crash if it fails
         if (!glfwInit()) throw new RuntimeException("GLFW Init Failed");
 
-        // requesting OpenGL 3.3 core profile
+        // requesting OpenGL 3.3 core profile (I need this for the shaders to work, 
+        //because they are running on version #3.30 core profile)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -87,7 +92,8 @@ public class SandSim {
         // load and compile shaders
         shaderProgram = createShader("src/vertex.glsl", "src/fragment.glsl");
 
-        // setting up VAO and buffers for full-screen quad
+        // setting up VAO and buffers for full-screen quad (quad is just referring to the setup of a basic square here
+        // as the particle mesh, (in the vertices array, you can see that its just two triangles, cause OpenGL loves triangles))
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
@@ -97,8 +103,14 @@ public class SandSim {
              1f, -1f, 1f, 0f,
              1f,  1f, 1f, 1f
         };
+
+        // This array tell OpenGL what order in which to render the vertices (it doesnt super matter in this case
+        // because im not rendering some complex 3d mesh, only simple 2d)
         int[] indices = {0, 1, 2, 2, 3, 0};
 
+        //VBO=vertex buffer object - basically the data being sent to the GPU
+        //EBO=element buffere arrays - optimize the ordering of the vertices when
+        //rendering to maximize performance
         int vbo = glGenBuffers();
         int ebo = glGenBuffers();
 
@@ -135,18 +147,35 @@ public class SandSim {
     }
 
     void placeParticle() {
-        // get mouse pos and convert to grid coordinates
-        DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
-        DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
-        glfwGetCursorPos(window, xb, yb);
-        int gx = (int)(xb.get(0) / CELL_SIZE);
-        int gy = (int)((yb.get(0)) / CELL_SIZE);
-        // only place inside bounds
+    DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
+    DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
+    glfwGetCursorPos(window, xb, yb);
+    int centerX = (int)(xb.get(0) / CELL_SIZE);
+    int centerY = (int)(yb.get(0) / CELL_SIZE);
+
+    Random rand = new Random();
+    int brushRadius = 5; // Radius in grid cells
+    int particlesPerFrame = 30; // Number of particles to place
+
+    for (int i = 0; i < particlesPerFrame; i++) {
+        // Use polar coordinates to bias distribution toward center
+        double angle = rand.nextDouble() * 2 * Math.PI;
+        double radius = brushRadius * Math.sqrt(rand.nextDouble()); // square root for center-bias
+
+        int dx = (int)(Math.cos(angle) * radius);
+        int dy = (int)(Math.sin(angle) * radius);
+
+        int gx = centerX + dx;
+        int gy = centerY + dy;
+
         if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT) {
             grid[gx][gy] = currentType;
         }
     }
+}
 
+    //The state machine/cellular automata that is the bulk of the logic/interactions
+    //behind the collisions of each particle
     void update() {
         for (int y = GRID_HEIGHT - 2; y >= 0; y--) {
             for (int x = 0; x < GRID_WIDTH; x++) {
@@ -222,7 +251,7 @@ public class SandSim {
                     }
                 }
 
-                // WOOD doesn't move, no logic needed
+                // WOOD doesn't move, no logic needed, it'll just be placed where the mouse clicks and stay there
             }
         }
 
